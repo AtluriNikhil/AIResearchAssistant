@@ -210,30 +210,6 @@ This makes the project easier to debug and extend. For example, if I want to add
 
 ---
 
-## 10. 5 Minute Speaking Script
-
-### Minute 1: Introduce the project
-
-This project is an AI Research Assistant. The user can upload documents and ask questions about them. Instead of answering from general knowledge, the system retrieves relevant document chunks and generates answers based on those chunks.
-
-### Minute 2: Explain document processing
-
-When a document is uploaded, the backend extracts text based on file type. Then it splits the text into smaller overlapping chunks. Each chunk is converted into a vector and stored in FAISS. This makes searching the document fast and efficient.
-
-### Minute 3: Explain RAG and agents
-
-When the user asks a question, the Research Agent searches FAISS and retrieves relevant chunks. The Summarizer Agent creates the first answer. The Critic Agent checks for missing or unsupported information. If needed, the Editor Agent improves the answer.
-
-### Minute 4: Explain architecture and technologies
-
-The frontend is built with Next.js and React. The backend is built with FastAPI. FAISS is used for vector search, SQLite is used for conversation memory, LangGraph manages the agent workflow, and Claude is used as the LLM provider.
-
-### Minute 5: Explain why it is useful
-
-This architecture is useful because it reduces hallucination, supports multiple documents, keeps conversation context, and separates responsibilities clearly. It is also easy to extend with new document types, new embedding models, or new LLM providers.
-
----
-
-## 11. Final Summary to Say
+## 11. Summary
 
 In summary, this project is a full-stack RAG-based research assistant. It combines document processing, vector search, multi-agent reasoning, conversation memory, and a clean web interface. The main strength is that answers are grounded in uploaded documents, and the architecture is modular enough to be extended into a production-level research assistant.
