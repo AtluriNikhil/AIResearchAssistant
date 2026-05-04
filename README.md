@@ -107,24 +107,38 @@ The multi-agent flow is represented with LangGraph. LangGraph gives the workflow
 
 The current graph is:
 
+```mermaid
+flowchart TD
+    A[User Query] --> B[Research Agent]
+    B --> C[Retrieved Document Chunks]
+    C --> D[Summarizer Agent]
+    D --> E[Initial Grounded Answer]
+    E --> F[Critic Agent]
+    F --> G{Gaps or unsupported content?}
+    G -- Yes --> H[Editor Agent]
+    H --> I[Final Polished Answer]
+    G -- No --> J[Skip Editor]
+    J --> I
+
+    B -. searches .-> K[(FAISS Document Indexes)]
+    B -. uses .-> L[Embedding Provider]
+    D -. calls .-> M[LLM Provider]
+    F -. calls .-> M
+    H -. calls .-> M
+    D -. uses .-> N[(SQLite Conversation Memory)]
+```
+
+Text fallback:
+
 ```text
-User Query
-    |
-    v
-Research Agent
-    |
-    v
-Summarizer Agent
-    |
-    v
-Critic Agent
-    |
-    +--> Editor Agent, if gaps are found
-    |
-    +--> Skip Editor, if no gaps are found
-    |
-    v
-Final Answer
+User Query -> Research Agent -> Summarizer Agent -> Critic Agent
+                                           |
+                              gaps found? |
+                                           v
+                                Editor Agent or Skip
+                                           |
+                                           v
+                                  Final Answer
 ```
 
 This architecture is good because each agent has one job:
@@ -578,6 +592,47 @@ GET /stats
 ---
 
 ## 14. Multi-Agent Workflow Details
+
+### Agent Workflow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Next.js UI
+    participant API as FastAPI API
+    participant Memory as SQLite Memory
+    participant Research as Research Agent
+    participant Store as FAISS Store
+    participant Summarizer as Summarizer Agent
+    participant Critic as Critic Agent
+    participant Editor as Editor Agent
+    participant LLM as LLM Provider
+
+    User->>UI: Ask a question
+    UI->>API: POST /ask-v2
+    API->>Memory: Save user message and load context
+    API->>Research: Start workflow
+    Research->>Store: Search selected document indexes
+    Store-->>Research: Relevant chunks
+    Research->>Summarizer: Query + chunks + conversation context
+    Summarizer->>LLM: Generate grounded answer
+    LLM-->>Summarizer: Initial answer
+    Summarizer->>Critic: Initial answer + context
+    Critic->>LLM: Evaluate answer quality
+    LLM-->>Critic: Strengths, gaps, suggestions
+    alt Gaps found
+        Critic->>Editor: Send critique and initial answer
+        Editor->>LLM: Refine answer using context only
+        LLM-->>Editor: Final polished answer
+    else No gaps found
+        Critic-->>API: Use initial answer
+    end
+    API->>Memory: Save assistant answer
+    API-->>UI: Answer + sources + workflow log
+    UI-->>User: Display final answer
+```
+
+The sequence diagram shows how the agents are used during a normal chat request. The user does not directly interact with each agent; the FastAPI backend starts the LangGraph workflow, and LangGraph passes a shared `AgentState` through each node.
 
 ### Research Agent
 
