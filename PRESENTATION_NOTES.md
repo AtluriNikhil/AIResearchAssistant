@@ -1,4 +1,4 @@
-# AI Research Assistant - 5 Minute Professor Explanation
+# AI Research Assistant
 
 ## 1. Short Introduction
 
