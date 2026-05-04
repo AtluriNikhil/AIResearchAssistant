@@ -1,0 +1,15 @@
+anthropic
+beautifulsoup4
+faiss-cpu
+fastapi
+langgraph
+lxml
+numpy
+openai
+pdfplumber
+pydantic
+python-docx
+python-dotenv
+python-multipart
+uvicorn[standard]
+voyageai
