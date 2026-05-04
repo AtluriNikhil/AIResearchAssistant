@@ -125,6 +125,7 @@ frontend/dist/
 frontend/build/
 frontend/.turbo/
 frontend/.vercel/
+frontend/tsconfig.tsbuildinfo
 
 # npm/yarn/pnpm logs
 npm-debug.log*

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   role: "user" | "assistant";
@@ -530,9 +532,15 @@ export default function ChatBox() {
                         </span>
                       </div>
                       <div className={`text-sm leading-relaxed ${
-                        m.role === "user" ? "text-white" : "text-gray-800"
+                        m.role === "user" ? "text-white whitespace-pre-wrap" : "text-gray-800 markdown-response"
                       }`}>
-                        {m.content}
+                        {m.role === "assistant" ? (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {m.content}
+                          </ReactMarkdown>
+                        ) : (
+                          m.content
+                        )}
                       </div>
                     </div>
                   </div>
